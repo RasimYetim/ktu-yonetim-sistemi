@@ -1,0 +1,80 @@
+
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KTU Yönetim Sistemi</title>
+  <link rel="icon" type="image/png" href="https://cdn.freelogovectors.net/wp-content/uploads/2020/07/karadeniz-teknik-universitesi-logo_ktu.png">
+
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="header">
+    <div class="logo-container"><a href="index.php">
+    <img src="https://pu.ktu.edu.tr/pluginfile.php/1/theme_remui/logo/1713768117/KT%C3%9C%20Logo%201A.png" alt="KTU YS Logosu"></a>
+    </div>
+  </header>
+
+  <div class="container">
+
+<h2>Mevcut Yöneticiler</h2>
+<table border="1">
+  <tr>
+    <th>ID</th>
+    <th>Ad Soyad</th>
+    <th>Kullanıcı Adı</th>
+    <th>İşlem</th>
+  </tr>
+  {% for yonetici in yoneticiler %}
+  <tr>
+    <td>{{ yonetici.yID }}</td>
+    <td>{{ yonetici.AdSoyad }}</td>
+    <td>{{ yonetici.kullanici_adi }}</td>
+    <td>
+      <form method="POST" action="{{ url_for('yonetici_sil', yID=yonetici.yID) }}" onsubmit="return confirm('Bu yöneticiyi silmek istediğinize emin misiniz?');">
+        <button type="submit">Sil</button>
+      </form>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+
+<h2>Yeni Yönetici Ekle</h2>
+<form method="POST" action="{{ url_for('yonetici_ekle') }}">
+    <label>Ad Soyad:</label><br>
+    <input type="text" name="AdSoyad" required><br>
+
+    <label>Kullanıcı Adı:</label><br>
+    <input type="text" name="kullanici_adi" required><br>
+
+    <label>Şifre:</label><br>
+    <input type="password" name="sifre" required><br>
+
+    <input type="submit" value="Yönetici Ekle">
+</form>
+  </div>
+  <footer class="footer">
+    <div class="footer-container">
+        <p>&copy; 2025 KTU Öğrenci Yönetim Sistemi. Tüm hakları saklıdır.</p>
+        <p>&copy; Made by LastHope</p>
+
+    </div>
+    <div class="footer-links">
+        <p><a href="about.html">Hakkında</a></p>
+
+        <p><a href="contact.html">İletişim</a></p>
+        <p><a href="privacy.html">Gizlilik Politikası</a></p>
+        <p><a href="terms.html">Kullanım Şartları</a></p>
+    </div>
+
+</footer>
+
+
+</body>
+</html>
+
+
+
+
