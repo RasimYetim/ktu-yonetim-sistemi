@@ -56,4 +56,4 @@ class Sinav(db.Model):
 class Seminer(db.Model):
     __tablename__ = 'seminer'
     seminerID = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    dersID = db.Column(db.Integer, nullable=False)  # FOREIGN KEY eksik tabloda
+    dersID = db.Column(db.Integer, nullable=False)
