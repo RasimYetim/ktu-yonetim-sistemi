@@ -1,3 +1,5 @@
+from crypt import methods
+
 from flask import Flask, render_template, request, redirect, url_for
 from models import db, Ogrenci, PC, Dersler
 from config import Config
@@ -235,3 +237,45 @@ def ders_sil(dID):
 @app.route('/pciliski')
 def pciliski():
     return render_template('pciliski.html')
+
+
+@app.route('/ogrekle', methods=['GET', 'POST'])
+def ogrekle():
+    if 'rol' not in session or session['rol'] != 'yonetici':
+        flash("Yetkisiz giriş.")
+        return redirect(url_for('ygiris'))
+
+    if request.method == 'POST':
+        adSoyad = request.form.get('adSoyad')
+        bolum = request.form.get('bolum')
+
+        if not adSoyad or not bolum:
+            flash("Tüm alanları doldurun.")
+            return redirect(url_for('ogrekle'))
+
+        try:
+            ogrenci = Ogrenci(adSoyad=adSoyad, bolum=bolum)
+            db.session.add(ogrenci)
+            db.session.commit()
+            flash("Öğrenci başarıyla eklendi.")
+        except Exception as e:
+            flash(f"Hata oluştu: {e}")
+
+        return redirect(url_for('ogrekle'))
+
+    ogrenciler = Ogrenci.query.all()
+    return render_template('ogrekle.html', ogrenciler=ogrenciler)
+@app.route('/ogrenci-sil/<int:ogrID>', methods=['POST'])
+def ogrenci_sil(ogrID):
+    if 'rol' not in session or session['rol'] != 'yonetici':
+        flash("Yetkisiz işlem.")
+        return redirect(url_for('ygiris'))
+
+    ogr = Ogrenci.query.get(ogrID)
+    if ogr:
+        db.session.delete(ogr)
+        db.session.commit()
+        flash("Öğrenci silindi.")
+    else:
+        flash("Öğrenci bulunamadı.")
+    return redirect(url_for('ogrekle'))

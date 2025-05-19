@@ -18,6 +18,56 @@
   </header>
 
   <div class="container">
+<h2>Mevcut Öğrenciler</h2>
+<table border="1">
+  <tr>
+    <th>ID</th>
+    <th>Ad Soyad</th>
+    <th>Bölüm</th>
+    <th>İşlem</th>
+  </tr>
+  {% for ogr in ogrenciler %}
+  <tr>
+    <td>{{ ogr.ogrID }}</td>
+    <td>{{ ogr.adSoyad }}</td>
+    <td>{{ ogr.bolum }}</td>
+    <td>
+      <form method="POST" action="{{ url_for('ogrenci_sil', ogrID=ogr.ogrID) }}" onsubmit="return confirm('Bu öğrenciyi silmek istediğinize emin misiniz?');">
+        <button type="submit">Sil</button>
+      </form>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+
+<h2>Yeni Öğrenci Ekle</h2>
+<form method="POST" action="{{ url_for('ogrekle') }}">
+    <label>Ad Soyad:</label><br>
+    <input type="text" name="adSoyad" required><br>
+
+    <label>Bölüm:</label><br>
+<select name="bolum" required>
+    <option value="">Bölüm Seçiniz</option>
+    <option value="Bilgisayar Mühendisliği">Bilgisayar Mühendisliği</option>
+    <option value="Elektrik Elektronik Mühendisliği">Elektrik Elektronik Mühendisliği</option>
+    <option value="Makine Mühendisliği">Makine Mühendisliği</option>
+    <option value="İnşaat Mühendisliği">İnşaat Mühendisliği</option>
+    <option value="Endüstri Mühendisliği">Endüstri Mühendisliği</option>
+</select><br>
+
+
+    <input type="submit" value="Ekle">
+</form>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul>
+      {% for message in messages %}
+        <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
 
   </div>
   <footer class="footer">
