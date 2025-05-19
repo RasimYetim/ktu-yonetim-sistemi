@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for
-from models import db, Ogrenci, PC
+from models import db, Ogrenci, PC, Dersler
 from config import Config
 from models import db, Akademisyen, Yonetici
 from flask import Flask, render_template, request, redirect, url_for, session, flash
@@ -176,9 +176,16 @@ def pc_sil(pcID):
     else:
         flash("Program çıktısı bulunamadı.")
     return redirect(url_for('pc_ekle'))
-@app.route('/dersekle')
+@app.route('/dersekle', methods=['GET', 'POST'])
 def dersekle():
-    return render_template('ders_ekle.html')
+    if 'rol' not in session or session['rol'] != 'yonetici':
+        flash("Yetkisiz erişim.")
+        return redirect(url_for('ygiris'))
+
+    dersler = Dersler.query.all()
+    akademisyenler = Akademisyen.query.all()
+    return render_template('ders_ekle.html', dersler=dersler, akademisyenler=akademisyenler)
+
 
 @app.route('/ders_ekle', methods=['GET', 'POST'])
 def ders_ekle():
@@ -186,22 +193,30 @@ def ders_ekle():
         flash("Yetkisiz erişim.")
         return redirect(url_for('ygiris'))
 
-    # POST: yeni ders ekle
     if request.method == 'POST':
-        dersAd = request.form['dersAd']
-        bolum = request.form['bolum']
-        sorumluID = request.form['sorumluID']
+        dersAd = request.form.get('dersAd')
+        bolum = request.form.get('bolum')
+        sorumluID = request.form.get('sorumluID')
 
-        yeni_ders = Dersler(dersAd=dersAd, bolum=bolum, sorumluID=sorumluID)
-        db.session.add(yeni_ders)
-        db.session.commit()
-        flash("Ders başarıyla eklendi.")
-        return redirect(url_for('dersekle'))
+        if not dersAd or not bolum or not sorumluID:
+            flash("Tüm alanları doldurmanız gerekiyor.")
+            return redirect(url_for('ders_ekle'))
 
-    # GET: listeleme için verileri hazırla
+        try:
+            sorumluID = int(sorumluID)
+            yeni_ders = Dersler(dersAd=dersAd, bolum=bolum, sorumluID=sorumluID)
+            db.session.add(yeni_ders)
+            db.session.commit()
+            flash("Ders başarıyla eklendi.")
+        except Exception as e:
+            flash(f"Hata oluştu: {str(e)}")
+
+        return redirect(url_for('ders_ekle'))
+
     dersler = Dersler.query.all()
     akademisyenler = Akademisyen.query.all()
     return render_template('ders_ekle.html', dersler=dersler, akademisyenler=akademisyenler)
+
 @app.route('/ders_sil/<int:dID>', methods=['POST'])
 def ders_sil(dID):
     if 'rol' not in session or session['rol'] != 'yonetici':
